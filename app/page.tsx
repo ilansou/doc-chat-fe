@@ -1,199 +1,84 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
-import axios from "axios";
-import { Send, Menu, Loader2 } from "lucide-react";
+import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { ArrowRight, Lock, Brain, Database } from "lucide-react";
+import ChatInterface from "@/components/ChatInterface";
 
-// Import our new components
-import Sidebar from "@/components/Sidebar";
-import MessageBubble from "@/components/MessageBubble";
-
-// --- TYPES ---
-type Source = {
-  file_name: string;
-  page_label: string;
-  text_snippet: string;
-  score: number;
-};
-
-type Message = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  sources?: Source[];
-};
-
-export default function Home() {
-  // --- STATE ---
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      role: "assistant",
-      content:
-        "Hello! Upload a PDF to the sidebar and ask me anything about it.",
-    },
-  ]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [files, setFiles] = useState<{ name: string; size: string }[]>([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  // --- HANDLERS ---
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files?.length) return;
-    setUploading(true);
-
-    const formData = new FormData();
-    const newFiles: { name: string; size: string }[] = [];
-
-    Array.from(e.target.files).forEach((file) => {
-      formData.append("files", file);
-      newFiles.push({
-        name: file.name,
-        size: (file.size / 1024).toFixed(2) + " KB",
-      });
-    });
-
-    try {
-      await axios.post("http://localhost:8000/upload", formData);
-      setFiles((prev) => [...prev, ...newFiles]);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now().toString(),
-          role: "assistant",
-          content: `✅ Indexed ${newFiles.length} file(s). Ready to chat!`,
-        },
-      ]);
-    } catch (error) {
-      alert("Error uploading files");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleSend = async () => {
-    if (!input.trim()) return;
-
-    const userMsg = input;
-    setInput("");
-    setMessages((prev) => [
-      ...prev,
-      { id: Date.now().toString(), role: "user", content: userMsg },
-    ]);
-    setLoading(true);
-
-    try {
-      const { data } = await axios.post("http://localhost:8000/chat", {
-        message: userMsg,
-      });
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content: data.response,
-          sources: data.sources,
-        },
-      ]);
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: "assistant",
-          content:
-            "Sorry, I couldn't reach the server. Is the backend running?",
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // --- RENDER ---
+export default function Page() {
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-      {/* 1. Sidebar Component */}
-      <Sidebar
-        isOpen={isSidebarOpen}
-        uploading={uploading}
-        files={files}
-        onUpload={handleUpload}
-      />
+    <>
+      {/* 1. If Signed In, show the App */}
+      <SignedIn>
+        <ChatInterface />
+      </SignedIn>
 
-      {/* 2. Main Chat Area */}
-      <main className="flex-1 flex flex-col w-full transition-all duration-300">
-        {/* Header */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sticky top-0 z-10">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-gray-100 rounded-md text-gray-600"
-            >
-              <Menu size={20} />
-            </button>
-            <h1 className="text-lg font-bold text-gray-800">
-              🔮 Personal Oracle
-            </h1>
-          </div>
-        </header>
+      {/* 2. If Signed Out, show Landing Page */}
+      <SignedOut>
+        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col items-center justify-center text-center p-6">
+          <div className="max-w-3xl space-y-8">
+            {/* Hero Icon */}
+            <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-xl shadow-blue-200">
+              <Brain size={40} className="text-white" />
+            </div>
 
-        {/* Messages List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-6 scroll-smooth">
-          {messages.map((msg) => (
-            // 3. Message Bubble Component
-            <MessageBubble
-              key={msg.id}
-              role={msg.role}
-              content={msg.content}
-              sources={msg.sources}
-            />
-          ))}
+            {/* Headlines */}
+            <div className="space-y-4">
+              <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight">
+                Your Personal{" "}
+                <span className="text-blue-600">Knowledge Oracle</span>
+              </h1>
+              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                Upload your PDFs and Markdown files. Chat with them securely
+                using AI. Your data is isolated and private.
+              </p>
+            </div>
 
-          {loading && (
-            <div className="flex gap-4 max-w-4xl mx-auto">
-              <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center">
-                <Loader2 size={16} className="text-white animate-spin" />
+            {/* Login Button */}
+            <SignInButton mode="modal">
+              <button className="group relative inline-flex items-center justify-center px-8 py-4 font-semibold text-white transition-all duration-200 bg-blue-600 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 shadow-lg hover:shadow-xl hover:-translate-y-1">
+                Get Started for Free
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </SignInButton>
+
+            {/* Features Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-12 text-left">
+              <div className="p-6 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-blue-600">
+                  <Database size={20} />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-2">RAG Technology</h3>
+                <p className="text-sm text-gray-500">
+                  Retrieval Augmented Generation ensures the AI answers based
+                  ONLY on your data.
+                </p>
               </div>
-              <div className="bg-white border border-gray-200 p-4 rounded-2xl text-gray-500 text-sm">
-                Thinking...
+              <div className="p-6 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-4 text-emerald-600">
+                  <Lock size={20} />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-2">
+                  Private & Secure
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Your data is isolated. What you upload is only visible to you.
+                </p>
+              </div>
+              <div className="p-6 bg-white rounded-xl border border-gray-100 shadow-sm">
+                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-4 text-purple-600">
+                  <Brain size={20} />
+                </div>
+                <h3 className="font-bold text-gray-900 mb-2">
+                  Smart Citations
+                </h3>
+                <p className="text-sm text-gray-500">
+                  The AI highlights exactly which page and line it got the
+                  answer from.
+                </p>
               </div>
             </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <div className="p-4 bg-white border-t border-gray-200">
-          <div className="max-w-4xl mx-auto relative flex items-center gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder="Ask a question about the uploaded documents..."
-              className="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-black"
-              disabled={loading}
-            />
-            <button
-              onClick={handleSend}
-              disabled={loading || !input.trim()}
-              className="p-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
-            >
-              <Send size={20} />
-            </button>
           </div>
         </div>
-      </main>
-    </div>
+      </SignedOut>
+    </>
   );
 }
