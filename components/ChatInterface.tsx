@@ -7,6 +7,8 @@ import Sidebar from "@/components/Sidebar";
 import MessageBubble from "@/components/MessageBubble";
 import CitationModal from "@/components/CitationModal";
 
+export const dynamic = "force-dynamic";
+
 export default function ChatInterface() {
   const { user } = useUser();
   const [messages, setMessages] = useState<any[]>([]);

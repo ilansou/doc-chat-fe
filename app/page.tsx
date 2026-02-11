@@ -3,6 +3,8 @@ import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { ArrowRight, Lock, Brain, Database } from "lucide-react";
 import ChatInterface from "@/components/ChatInterface";
 
+export const dynamic = "force-dynamic";
+
 export default function Page() {
   return (
     <>

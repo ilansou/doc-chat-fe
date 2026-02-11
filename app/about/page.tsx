@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default function About() {
   return (
     <div className="min-h-screen bg-white p-8 md:p-16 prose max-w-none">
