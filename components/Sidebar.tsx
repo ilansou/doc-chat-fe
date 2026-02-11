@@ -35,7 +35,7 @@ export default function Sidebar({
       <aside
         className={`
     fixed inset-y-0 left-0 z-30 bg-white border-r border-gray-200 
-    transition-all duration-300 ease-in-out flex flex-col
+    transition-all duration-300 ease-in-out flex flex-col overflow-hidden
     ${isOpen ? "translate-x-0 w-64" : "-translate-x-full w-0"}
     md:relative md:translate-x-0 ${isOpen ? "md:w-64" : "md:w-0"}
   `}
