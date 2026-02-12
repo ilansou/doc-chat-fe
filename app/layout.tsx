@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "Personal Knowledge Oracle",
   description: "Chat with your documents securely.",
   icons: {
-    icon: "problem.png",
+    icon: "icon.png",
   },
 };
 
