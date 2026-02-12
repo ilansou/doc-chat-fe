@@ -1,8 +1,6 @@
 # 🔮 Personal Knowledge Oracle (AI RAG SaaS)
 
-### [🚀 View Live Demo](https://your-project-name.vercel.app)
-
-_(Replace this link after you deploy to Vercel)_
+### [🚀 View Live Demo](https://doc-chat-fe.vercel.app)
 
 ![Project Status](https://img.shields.io/badge/Status-Live-success)
 ![Tech Stack](https://img.shields.io/badge/Stack-Next.js_|_FastAPI_|_LlamaIndex-blue)
@@ -27,7 +25,7 @@ It features a **Multi-Tenant Architecture**, ensuring that User A can never acce
 - **HTTP Client:** Axios
 - **State Management:** React Hooks
 
-### Backend (Server) - _[View Backend Repo](https://github.com/your-username/your-backend-repo)_
+### Backend (Server) - _[View Backend Repo](https://github.com/ilansou/doc-chat-be)_
 
 - **API Framework:** FastAPI (Python)
 - **AI Orchestration:** LlamaIndex
@@ -78,11 +76,11 @@ Implemented strict **Row Level Security (RLS)** logic at the application level.
 
 ```bash
 # Clone Frontend
-git clone https://github.com/yourusername/oracle-frontend.git
+git clone https://github.com/ilansou/doc-chat-fe.git
 cd oracle-frontend
 
 # Clone Backend (In a separate terminal)
-git clone https://github.com/yourusername/oracle-backend.git
+git clone https://github.com/ilansou/doc-chat-be.git
 cd oracle-backend
 ```
 
